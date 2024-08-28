@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import ApiCall from './components/ApiCall';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/" element={<Home />} />
           {/* Add more routes as needed */}
         </Routes>
+        <ApiCall />
         <Footer />
       </div>
     </Router>
