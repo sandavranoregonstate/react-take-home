@@ -1,48 +1,47 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const ApiCall = () => {
+const ForecastApiCall = () => {
   const [city, setCity] = useState('');
-  const [weather, setWeather] = useState(null);
+  const [forecast, setForecast] = useState(null);
   const [error, setError] = useState('');
 
   const API_KEY = '25ae58a99c9370c9164ddddc34c87f9c'; // Replace with your OpenWeatherMap API key
 
-  const getWeather = async () => {
+  const getForecast = async () => {
     if (!city) {
       setError('Please enter a city name.');
       return;
     }
 
     try {
-      console.log(city);
       const response = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`
       );
       console.log(response.data);
-      setWeather(response.data);
+      setForecast(response.data);
       setError('');
     } catch (err) {
-      setError('Could not fetch weather data. Please try again.');
-      setWeather(null);
+      setError('Could not fetch forecast data. Please try again.');
+      setForecast(null);
     }
   };
 
   const resetPage = () => {
     setCity('');
-    setWeather(null);
+    setForecast(null);
     setError('');
   };
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-      getWeather();
+      getForecast();
     }
   };
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Weather App</h1>
+      <h1>5-Day Weather Forecast</h1>
       <input
         type="text"
         placeholder="Enter city name"
@@ -50,22 +49,27 @@ const ApiCall = () => {
         onChange={(e) => setCity(e.target.value)}
         onKeyPress={handleKeyPress}
       />
-      <button onClick={getWeather}>Get Weather</button>
+      <button onClick={getForecast}>Get Forecast</button>
       <button onClick={resetPage} style={{ marginLeft: '10px' }}>Reset</button>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {weather && (
+      {forecast && (
         <div style={{ marginTop: '20px' }}>
-          <h2>{weather.name}</h2>
-          <p>Temperature: {weather.main.temp} °C</p>
-          <p>Weather: {weather.weather[0].description}</p>
-          <p>Humidity: {weather.main.humidity}%</p>
-          <p>Wind Speed: {weather.wind.speed} m/s</p>
+          <h2>Forecast for {forecast.city.name}</h2>
+          {forecast.list.slice(0, 40).map((item, index) => (
+            <div key={index} style={{ marginBottom: '20px' }}>
+              <p><strong>{new Date(item.dt_txt).toLocaleString()}</strong></p>
+              <p>Temperature: {item.main.temp} °C</p>
+              <p>Weather: {item.weather[0].description}</p>
+              <p>Humidity: {item.main.humidity}%</p>
+              <p>Wind Speed: {item.wind.speed} m/s</p>
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
 };
 
-export default ApiCall;
+export default ForecastApiCall;

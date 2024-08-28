@@ -1,56 +1,55 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const ApiCall = () => {
-  const [city, setCity] = useState('');
+const LocationWeather = () => {
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
 
   const API_KEY = '25ae58a99c9370c9164ddddc34c87f9c'; // Replace with your OpenWeatherMap API key
 
-  const getWeather = async () => {
-    if (!city) {
-      setError('Please enter a city name.');
-      return;
-    }
-
-    try {
-      console.log(city);
-      const response = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          fetchWeather(position.coords.latitude, position.coords.longitude);
+        },
+        (err) => {
+          setError('Failed to retrieve your location.');
+        }
       );
-      console.log(response.data);
+    } else {
+      setError('Geolocation is not supported by this browser.');
+    }
+  };
+
+  const fetchWeather = async (latitude, longitude) => {
+    try {
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`
+      );
       setWeather(response.data);
       setError('');
     } catch (err) {
       setError('Could not fetch weather data. Please try again.');
-      setWeather(null);
     }
   };
 
   const resetPage = () => {
-    setCity('');
+    setLocation({ latitude: null, longitude: null });
     setWeather(null);
     setError('');
   };
 
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
-      getWeather();
-    }
-  };
-
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Weather App</h1>
-      <input
-        type="text"
-        placeholder="Enter city name"
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-        onKeyPress={handleKeyPress}
-      />
-      <button onClick={getWeather}>Get Weather</button>
+      <h1>Current Weather at Your Location</h1>
+
+      <button onClick={getUserLocation}>Get Weather</button>
       <button onClick={resetPage} style={{ marginLeft: '10px' }}>Reset</button>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -68,4 +67,4 @@ const ApiCall = () => {
   );
 };
 
-export default ApiCall;
+export default LocationWeather;
