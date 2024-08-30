@@ -1,41 +1,37 @@
+// src/pages/Home.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/free-solid-svg-icons';
 
 const Home = () => {
-
-    // Variables.
-    const [location, setLocation] = useState({ latitude: null, longitude: null });
+    // Variable.
     const [city, setCity] = useState('');
     const [weather, setWeather] = useState(null);
     const [userLocationWeather, setUserLocationWeather] = useState(null);
     const [error, setError] = useState('');
     const [forecast, setForecast] = useState(null);
-    const [wait, setWait] = useState(false); 
+    const [wait, setWait] = useState(false);
+    const navigate = useNavigate();
 
-    // API Key.
-    const API_KEY = '25ae58a99c9370c9164ddddc34c87f9c'; 
+    // API Key
+    const API_KEY = '25ae58a99c9370c9164ddddc34c87f9c';
 
-    // Get user location.
-
+    // Get user location
     const getUserLocationWeather = () => {
-
+        resetPage();
         setWait(true);
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                setLocation({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                });
-                fetchWeather(position.coords.latitude, position.coords.longitude);
-            },
-            (err) => {
-                resetPage();
-                setError('Failed to retrieve your location.');
-            }
+                    fetchWeather(position.coords.latitude, position.coords.longitude);
+                },
+                (err) => {
+                    setError('Failed to retrieve your location.');
+                }
             );
         } else {
-            resetPage();
             setError('Geolocation is not supported by this browser.');
         }
     };
@@ -73,7 +69,7 @@ const Home = () => {
         }
     };
 
-    // Get current weather.
+    // Get current weather
     const getWeather = async () => {
         if (!city) {
             resetPage();
@@ -92,7 +88,7 @@ const Home = () => {
         }
     };
 
-    // Reset Page.
+    // Reset page.
     const resetPage = () => {
         setError('');
         setWeather(null);
@@ -104,6 +100,14 @@ const Home = () => {
     // Render.
     return (
         <div style={{ textAlign: 'center', marginTop: '50px' }}>
+            <h1>Sean Davran.</h1>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                <FontAwesomeIcon icon={faStar} style={{ marginBottom: '25px' }}/>
+                <FontAwesomeIcon icon={faStar} style={{ marginBottom: '25px' }}/>
+                <FontAwesomeIcon icon={faStar} style={{ marginBottom: '25px' }}/>
+                <FontAwesomeIcon icon={faStar} style={{ marginBottom: '25px' }}/>
+                <FontAwesomeIcon icon={faStar} style={{ marginBottom: '25px' }}/>
+            </div> 
             <input
                 type="text"
                 placeholder="Enter city name"
@@ -111,11 +115,14 @@ const Home = () => {
                 onChange={(e) => setCity(e.target.value)}
             />
 
-            <button onClick={getWeather}>Get Weather</button>
-            <button onClick={getForecast}>Get Forecast</button>
-            <button onClick={getUserLocationWeather}>Get weather in user location.</button>
-            <button onClick={resetPage} style={{ marginLeft: '10px' }}>Reset</button>
-    
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20px' }}>
+                <button onClick={getWeather} style={{ marginBottom: '10px' }}>Get Weather</button>
+                <button onClick={getForecast} style={{ marginBottom: '10px' }}>Get Forecast</button>
+                <button onClick={getUserLocationWeather} style={{ marginBottom: '10px' }}>Get weather in user location.</button>
+                <button onClick={resetPage} style={{ marginBottom: '10px' }}>Reset</button>
+                <button onClick={() => navigate('/info')} style={{ marginBottom: '10px' }}>Info</button>
+            </div>
+
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {weather && (
                 <div style={{ marginTop: '20px' }}>
@@ -155,7 +162,7 @@ const Home = () => {
                 </div>
             )}
         </div>
-      );
-  };
-  
-  export default Home;
+    );
+};
+
+export default Home;
